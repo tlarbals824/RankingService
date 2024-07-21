@@ -52,25 +52,17 @@ class UserRankRepositoryProxy(
                     )
                 )
             },
-            replaceMethod = { saveUserScoreToDatabase(userScore) }
+            replaceMethod = {
+                userRankJpaRepository.upsert(
+                    RankMapper.toUserRankInfo(
+                        userScore.userId,
+                        userScore.score
+                    )
+                )
+            }
         )
     }
 
-    private fun saveUserScoreToDatabase(userScore: UserScore) {
-        userRankJpaRepository.findByIdOrNull(userScore.userId)?.let {
-            userRankJpaRepository.save(
-                UserScoreEntity(
-                    id = it.id,
-                    score = it.score + userScore.score
-                )
-            )
-        } ?: userRankJpaRepository.save(
-            UserScoreEntity(
-                id = userScore.userId,
-                score = userScore.score
-            )
-        )
-    }
 
     private inline fun <reified T> replaceIfDisableToRequestTargetMethod(
         targetMethod: () -> T,

@@ -21,21 +21,8 @@ class UserRankPersistenceScheduler(
     fun persistUserScores() {
         println("Persisting user scores..., ${userScoreQueue.size}")
         while (userScoreQueue.isNotEmpty()) {
-            userScoreQueue.poll().let {
-                userRankJpaRepository.findByIdOrNull(it.id)?.let { existScore ->
-                    userRankJpaRepository.save(
-                        UserScoreEntity(
-                            id = it.id,
-                            score = it.score + existScore.score
-                        )
-                    )
-                } ?: userRankJpaRepository.save(
-                    UserScoreEntity(
-                        id = it.id,
-                        score = it.score
-                    )
-                )
-            }
+            val userScoreEntity = userScoreQueue.poll()
+            userRankJpaRepository.upsert(userScoreEntity)
         }
     }
 
