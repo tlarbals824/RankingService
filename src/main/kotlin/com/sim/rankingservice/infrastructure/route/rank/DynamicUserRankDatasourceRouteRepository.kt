@@ -11,18 +11,18 @@ import org.springframework.scheduling.annotation.Scheduled
 class DynamicUserRankDatasourceRouteRepository(
     private val userRankMySQLRepository: UserRankMySQLRepository,
     private val userRankRedisRepository: UserRankRedisRepository,
-) : UserRankRepository{
+) : UserRankRepository {
 
-    companion object{
+    companion object {
         val ORIGIN_DATASOURCE = Datasource.REDIS
         var DATASOURCE_SWITCH = Datasource.REDIS
     }
 
     @Scheduled(fixedRate = 100000)
-    fun checkDatasource(){
-        if(DATASOURCE_SWITCH==Datasource.MYSQL){
-            userRankRedisRepository.findAll(10)
-            DATASOURCE_SWITCH=Datasource.REDIS
+    fun checkDatasource() {
+        if (DATASOURCE_SWITCH == Datasource.MYSQL) {
+            userRankRedisRepository.findAll(1)
+            DATASOURCE_SWITCH = Datasource.REDIS
         }
     }
 
@@ -51,13 +51,13 @@ class DynamicUserRankDatasourceRouteRepository(
         targetMethod: () -> T,
         replaceMethod: () -> T
     ): T {
-        if(ORIGIN_DATASOURCE == DATASOURCE_SWITCH)
-            return targetMethod()
+        if (ORIGIN_DATASOURCE != DATASOURCE_SWITCH)
+            return replaceMethod()
 
         try {
             return targetMethod()
         } catch (e: Exception) {
-            DATASOURCE_SWITCH=Datasource.MYSQL
+            DATASOURCE_SWITCH = Datasource.MYSQL
             return replaceMethod()
         }
     }
