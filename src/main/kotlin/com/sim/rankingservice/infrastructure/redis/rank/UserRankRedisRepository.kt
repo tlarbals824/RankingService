@@ -3,12 +3,11 @@ package com.sim.rankingservice.infrastructure.redis.rank
 import com.sim.rankingservice.application.rank.port.outbound.UserRankRepository
 import com.sim.rankingservice.domain.rank.model.UserRank
 import com.sim.rankingservice.domain.rank.model.UserScore
-import org.springframework.data.redis.connection.stream.RecordId
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Repository
 
 @Repository
-class UserRankRepositoryImpl(
+class UserRankRedisRepository(
     private val redisTemplate: RedisTemplate<String, String>
 ) : UserRankRepository {
     override fun findAll(limit: Int): List<UserRank> {
